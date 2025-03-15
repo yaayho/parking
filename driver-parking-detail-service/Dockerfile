@@ -1,42 +1,38 @@
-#ARG NAME_APP=Users
+# Argumento global
+ARG NAME_APP=driver-parking-detail-service
 
-FROM openjdk:21
-#as builder
-#ARG NAME_APP
-#LABEL authors="jairz"
+# Etapa de construcción
+FROM eclipse-temurin:23-alpine AS builder
 
+ARG NAME_APP
 
-WORKDIR /app
-#WORKDIR /app/$NAME_APP
+WORKDIR /app/$NAME_APP
 
-COPY ./target/Users-0.0.1-SNAPSHOT.jar .
-#COPY ./pom.xml /app
-#COPY ./Users .
-#COPY ./$NAME_APP/.mvn ./.mvn
-#COPY ./$NAME_APP/mvnw .
-#COPY ./$NAME_APP/pom.xml .
+# Copiar los archivos de configuración de Maven y construir las dependencias
+COPY ./pom.xml /app
+COPY ./$NAME_APP/pom.xml ./
+COPY ./$NAME_APP/.mvn ./.mvn
+COPY ./$NAME_APP/mvnw ./
+RUN  ./mvnw clean package -Dmaven.test.skkp -Dmaven.main.skkp -Dspring-boot.repackage.skip && rm -r ./target/
+#RUN  ./mvnw dependency:go-offline
 
-#RUN  ./mvnw clean package -DskipTests
-#RUN  ./mvnw clean package -Dmaven.test.skkp -Dmaven.main.skkp -Dspring-boot.repackage.skip
-#&& rm -r ./target/
+# Copiar el código fuente y construir el paquete
+COPY ./$NAME_APP/src ./src
+RUN  ./mvnw clean package -DskipTests
 
-#RUN ./mvnw dependency:go-offline
-#COPY ./Users/src ./src
+# Etapa de ejecución
+FROM eclipse-temurin:23-alpine
 
-#RUN  ./mvnw clean package -DskipTests
+ARG NAME_APP
+WORKDIR /app/$NAME_APP
 
-#FROM  openjdk:21
-#ARG NAME_APP
+RUN mkdir ./logs
 
-#WORKDIR /app
+# Copiar el archivo .jar generado en la fase de construcción
+COPY --from=builder /app/$NAME_APP/target/$NAME_APP-0.0.1-SNAPSHOT.jar .
 
-#RUN mkdir ./logs
+# Exponer el puerto de la aplicación
+EXPOSE 8012
 
-#ARG TARGET_APP=/app/$NAME_APP/target
-#COPY --from=builder $TARGET_APP/Users-0.0.1-SNAPSHOT.jar .
-#ENV PORT 8000
-#EXPOSE $PORT
-EXPOSE 8001
-ENTRYPOINT ["java", "-jar", "Users-0.0.1-SNAPSHOT.jar"]
-#ENTRYPOINT ["java", "-jar", "./target/Users-0.0.1-SNAPSHOT.jar"]
-#CMD ["java", "-jar", "Users-0.0.1-SNAPSHOT.jar"]
+# Comando para ejecutar la aplicación
+ENTRYPOINT ["java", "-jar", "driver-parking-detail-service-0.0.1-SNAPSHOT.jar"]

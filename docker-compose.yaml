@@ -6,13 +6,13 @@ services:
     ports:
       - "3307:3306"
     environment:
-      MYSQL_DATABASE: usuarios
+      MYSQL_DATABASE: parking-history
       MYSQL_ROOT_PASSWORD: root
     volumes:
       - data-mysql:/var/lib/mysql
     restart: always
     networks:
-      - curso-k8s
+      - parking-network
 
   postgres16:
     container_name: postgres16
@@ -20,52 +20,49 @@ services:
     ports:
       - "5433:5432"
     environment:
-      POSTGRES_DB: cursos
+      POSTGRES_DB: parking-detail
       POSTGRES_PASSWORD: postgres
     volumes:
       - data-pgsql:/var/lib/postgresql/data
     restart: always
     networks:
-      - curso-k8s
+      - parking-network
 
-  #Users:
-  users:
-    container_name: users
-    #image: users:latest
-    image: yaayho/users
+  driver-parking-detail-service:
+    container_name: driver-parking-detail-service
+    image: driver-parking-detail-image:latest
+    #image: yaayho/driver-parking-detail-image
     build:
       tags:
-        #- users:latest
-        - yaayho/users
+        - driver-parking-detail-image:latest
+        - yaayho/driver-parking-detail-image
       context: ./
-      dockerfile: ./Users/Dockerfile
+      dockerfile: ./driver-parking-detail-service/Dockerfile
     ports:
-      - "8001:8001"
-    env_file: ./Users/.env
+      - "8012:8012"
+    env_file: ./driver-parking-detail-service/.env
     networks:
-      - curso-k8s
+      - parking-network
     depends_on:
       - mysql8
 
-  #Courses:
-  courses:
-    container_name: courses
-    #image: courses:latest
-    image: yaayho/courses
+  driver-parking-history-service:
+    container_name: driver-parking-history-service
+    image: driver-parking-history-image:latest
+    #image: yaayho/driver-parking-history-image
     build:
       tags:
-        #- courses:latest
-        - yaayho/courses
+        - driver-parking-history-image:latest
+        - yaayho/driver-parking-history-image
       context: ./
-      dockerfile: ./Courses/Dockerfile
+      dockerfile: ./driver-parking-history-service/Dockerfile
     ports:
-      - "8002:8002"
-    env_file: ./Courses/.env
+      - "8011:8011"
+    env_file: ./driver-parking-history-service/.env
     networks:
-      - curso-k8s
+      - parking-network
     depends_on:
       - postgres16
-      - users
 
 volumes:
   data-mysql:
@@ -74,6 +71,6 @@ volumes:
     name: data-pgsql
 
 networks:
-  curso-k8s:
-    name: curso-k8s
+  parking-network:
+    name: parking-network
     external: true
