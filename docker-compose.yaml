@@ -1,0 +1,79 @@
+#version: ""
+services:
+  mysql8:
+    container_name: mysql8
+    image: mysql:8
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_DATABASE: usuarios
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - data-mysql:/var/lib/mysql
+    restart: always
+    networks:
+      - curso-k8s
+
+  postgres16:
+    container_name: postgres16
+    image: postgres:16.2-alpine
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: cursos
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - data-pgsql:/var/lib/postgresql/data
+    restart: always
+    networks:
+      - curso-k8s
+
+  #Users:
+  users:
+    container_name: users
+    #image: users:latest
+    image: yaayho/users
+    build:
+      tags:
+        #- users:latest
+        - yaayho/users
+      context: ./
+      dockerfile: ./Users/Dockerfile
+    ports:
+      - "8001:8001"
+    env_file: ./Users/.env
+    networks:
+      - curso-k8s
+    depends_on:
+      - mysql8
+
+  #Courses:
+  courses:
+    container_name: courses
+    #image: courses:latest
+    image: yaayho/courses
+    build:
+      tags:
+        #- courses:latest
+        - yaayho/courses
+      context: ./
+      dockerfile: ./Courses/Dockerfile
+    ports:
+      - "8002:8002"
+    env_file: ./Courses/.env
+    networks:
+      - curso-k8s
+    depends_on:
+      - postgres16
+      - users
+
+volumes:
+  data-mysql:
+    name: data-mysql
+  data-pgsql:
+    name: data-pgsql
+
+networks:
+  curso-k8s:
+    name: curso-k8s
+    external: true
