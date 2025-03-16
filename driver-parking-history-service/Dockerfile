@@ -2,7 +2,7 @@
 ARG NAME_APP=driver-parking-history-service
 
 # Etapa de construcción
-FROM eclipse-temurin:23-alpine AS builder
+FROM eclipse-temurin:23-jdk-alpine AS builder
 
 ARG NAME_APP
 
@@ -21,7 +21,7 @@ COPY ./$NAME_APP/src ./src
 RUN  ./mvnw clean package -DskipTests
 
 # Etapa de ejecución
-FROM eclipse-temurin:23-alpine
+FROM eclipse-temurin:23-jre-alpine
 
 ARG NAME_APP
 WORKDIR /app/$NAME_APP
