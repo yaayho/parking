@@ -1,6 +1,6 @@
 # ---------------------- Ejecutando directamente los servicios desde la linea de comandos ---------------------- #
-.\driver-parking-detail-service\mvnw clean package  -DskipTests
-.\driver-parking-history-service\mvnw clean package  -DskipTests
+.\driver-parking-detail-service\mvnw clean package  -DskipTests -pl :driver-parking-detail-service
+.\driver-parking-history-service\mvnw clean package  -DskipTests  -pl :driver-parking-history-service
 
 java -jar .\driver-parking-detail-service\target\driver-parking-detail-service-0.0.1-SNAPSHOT.jar
 java -jar .\driver-parking-history-service\target\driver-parking-history-service-0.0.1-SNAPSHOT.jar
