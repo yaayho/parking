@@ -6,8 +6,11 @@ java -jar .\driver-parking-detail-service\target\driver-parking-detail-service-0
 java -jar .\driver-parking-history-service\target\driver-parking-history-service-0.0.1-SNAPSHOT.jar
 
 # ---------------------- Ejecutando servicios con docker ---------------------- #
-docker run -d --rm -p 5533:5532 -d --name postgres16 --network  parking-network -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=parking-detail -v data-pgsql:/var/lib/postgresql/data postgres:16.2-alpine
-docker run -d --rm -p 3307:3306 -d --name mysql8 --network  parking-network -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=parking-history -v data-mysql:/var/lib/mysql  mysql:8
+docker run -d --rm -p 5533:5532 --name postgres16 --network  parking-network -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=parking-detail -v data-pgsql:/var/lib/postgresql/data postgres:16.2-alpine
+docker run -d --rm -p 3307:3306 --name mysql8 --network  parking-network -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=parking-history -v data-mysql:/var/lib/mysql  mysql:8
+
+docker build . -f .\Dockerfile_H2 -t h2-image
+docker run -d --rm -p 9092:9092 -p 8082:8082 --name h2 --network parking-network -e H2_PASSWORD=sa -e H2_DBS=parking-detail,parking-history -v data-h2:/opt/h2/data h2-image
 
 docker build . -f ./driver-parking-detail-service/Dockerfile -t driver-parking-detail-image
 docker run -d --rm -p 8012:8012 --env-file ./driver-parking-detail-service/.env --name driver-parking-detail-service --network  parking-network driver-parking-detail-image
@@ -16,5 +19,4 @@ docker build . -f ./driver-parking-history-service/Dockerfile -t driver-parking-
 docker run -d --rm -p 8011:8011 --env-file ./driver-parking-history-service/.env --name driver-parking-history-service --network  parking-network driver-parking-history-image
 
 # ---------------------- Ejecutando servicios con docker-compose ---------------------- #
-
 docker-compose up --build -d

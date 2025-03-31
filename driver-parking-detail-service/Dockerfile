@@ -58,6 +58,9 @@ FROM alpine:latest
 ARG NAME_APP
 WORKDIR /app/$NAME_APP
 
+RUN addgroup --system javauser && adduser -S -s /bin/false -G javauser javauser && \
+    chown -R javauser:javauser ./
+
 # Copia JRE personalizado
 COPY --from=jlink-builder /custom-jre /opt/jre
 ENV PATH="/opt/jre/bin:$PATH"
@@ -71,5 +74,7 @@ RUN mkdir ./logs
 # Exponer el puerto de la aplicación
 EXPOSE 8012
 
+
 # Comando para ejecutar la aplicación
+USER javauser
 ENTRYPOINT ["java", "-jar", "driver-parking-detail-service-0.0.1-SNAPSHOT.jar"]

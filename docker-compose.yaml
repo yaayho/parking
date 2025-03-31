@@ -1,29 +1,49 @@
 #version: ""
 services:
-  mysql8:
-    container_name: mysql8
-    image: mysql:8
-    ports:
-      - "3307:3306"
-    environment:
-      MYSQL_DATABASE: parking-history
-      MYSQL_ROOT_PASSWORD: root
-    volumes:
-      - data-mysql:/var/lib/mysql
-    restart: always
-    networks:
-      - parking-network
+  #mysql8:
+    #container_name: mysql8
+    #image: mysql:8
+    #ports:
+      #- "3307:3306"
+    #environment:
+      #MYSQL_DATABASE: parking-history
+      #MYSQL_ROOT_PASSWORD: root
+    #volumes:
+      #- data-mysql:/var/lib/mysql
+    #restart: always
+    #networks:
+      #- parking-network
 
-  postgres16:
-    container_name: postgres16
-    image: postgres:16.2-alpine
+  #postgres16:
+    #container_name: postgres16
+    #image: postgres:16.2-alpine
+    #ports:
+      #- "5433:5432"
+    #environment:
+      #POSTGRES_DB: parking-detail
+      #POSTGRES_PASSWORD: postgres
+    #volumes:
+      #- data-pgsql:/var/lib/postgresql/data
+    #restart: always
+    #networks:
+      #- parking-network
+
+  h2:
+    container_name: h2
+    image: h2-image
+    build:
+      tags:
+        - h2-image:latest
+        - yaayho/h2-image
+      dockerfile: ./Dockerfile_H2
     ports:
-      - "5433:5432"
+      - "8082:8082"
+      - "9092:9092"
     environment:
-      POSTGRES_DB: parking-detail
-      POSTGRES_PASSWORD: postgres
+      H2_PASSWORD: sa
+      H2_DBS: parking-detail,parking-history
     volumes:
-      - data-pgsql:/var/lib/postgresql/data
+      - data-h2:/opt/h2/data
     restart: always
     networks:
       - parking-network
@@ -44,7 +64,8 @@ services:
     networks:
       - parking-network
     depends_on:
-      - mysql8
+      #- mysql8
+      - h2
 
   driver-parking-history-service:
     container_name: driver-parking-history-service
@@ -62,13 +83,16 @@ services:
     networks:
       - parking-network
     depends_on:
-      - postgres16
+      #- postgres16
+      - h2
 
 volumes:
-  data-mysql:
-    name: data-mysql
-  data-pgsql:
-    name: data-pgsql
+  #data-mysql:
+    #name: data-mysql
+  #data-pgsql:
+    #name: data-pgsql
+  data-h2:
+    name: data-h2
 
 networks:
   parking-network:
