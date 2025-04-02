@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: driver-parking-history
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: driver-parking-history
+  template:
+    metadata:
+      labels:
+        app: driver-parking-history
+    spec:
+      containers:
+      - image: yaayho/driver-parking-history-image
+        name: driver-parking-history
+        ports:
+        - containerPort: 8011
+        env:
+          - name: PORT
+            value: "8011"
+          - name: DB_HOST
+            value: "h2:9092//opt/h2/data"
+          - name: DB_DATABASE
+            value: "parking-history"
+          - name: DB_USERNAME
+            value: "sa"
+          - name: DB_PASSWORD
+            value: "sa"

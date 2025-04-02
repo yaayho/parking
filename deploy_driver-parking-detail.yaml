@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: driver-parking-detail
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: driver-parking-detail
+  template:
+    metadata:
+      labels:
+        app: driver-parking-detail
+    spec:
+      containers:
+      - image: yaayho/driver-parking-detail-image
+        name: driver-parking-detail
+        ports:
+        - containerPort: 8012
+        env:
+          - name: PORT
+            value: "8012"
+          - name: DB_HOST
+            value: "h2:9092//opt/h2/data"
+          - name: DB_DATABASE
+            value: "parking-detail"
+          - name: DB_USERNAME
+            value: "sa"
+          - name: DB_PASSWORD
+            value: "sa"

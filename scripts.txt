@@ -20,3 +20,14 @@ docker run -d --rm -p 8011:8011 --env-file ./driver-parking-history-service/.env
 
 # ---------------------- Ejecutando servicios con docker-compose ---------------------- #
 docker-compose up --build -d
+
+# ---------------------- Ejecutando servicios con kubernetes ---------------------- #
+docker push yaayho/h2-image
+docker push yaayho/driver-parking-detail-image
+docker push yaayho/driver-parking-history-image
+
+kubectl apply -f deploy_h2.yaml -f svc_h2.yaml
+kubectl apply -f deploy_driver-parking-detail.yaml -f svc_driver-parking-detail.yaml
+
+
+
