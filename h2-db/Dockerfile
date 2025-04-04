@@ -55,6 +55,6 @@ ENV H2_DATA=/opt/h2/data \
     H2_DBS=test
 
 # Script creación DB y ejecución h2
-COPY h2_entrypoint.sh .
-#RUN sed -i 's/\r$//' h2_entrypoint.sh
-ENTRYPOINT ["/opt/h2/h2_entrypoint.sh"]
+COPY entrypoint.sh .
+#RUN sed -i 's/\r$//' entrypoint.sh
+ENTRYPOINT ["/opt/h2/entrypoint.sh"]

@@ -1,0 +1,149 @@
+# Deployment DB H2
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: h2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: h2
+  template:
+    metadata:
+      labels:
+        app: h2
+    spec:
+      containers:
+        - image: yaayho/h2-image
+          name: h2
+          ports:
+            - containerPort: 8082
+            - containerPort: 9092
+          env:
+            - name: H2_DBS
+              #value: parking-detail,parking-history
+              valueFrom:
+                configMapKeyRef:
+                  key: H2_DBS
+                  name: h2
+            - name: H2_PASSWORD
+              #value: sa
+              valueFrom:
+                secretKeyRef:
+                  key: H2_PASSWORD
+                  name: h2
+          volumeMounts:
+            - mountPath: /opt/h2/data
+              name: data-h2
+      volumes:
+        - name: data-h2
+          persistentVolumeClaim:
+            claimName: pvc-h2
+            #hostPath:
+            #path: /var/lib/docker/volumes/data-h2/_data
+            #type: DirectoryOrCreate
+---
+# Deployment msvc parking-detail
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: driver-parking-detail
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: driver-parking-detail
+  template:
+    metadata:
+      labels:
+        app: driver-parking-detail
+    spec:
+      containers:
+        - image: yaayho/driver-parking-detail-image
+          name: driver-parking-detail
+          ports:
+            - containerPort: 8012
+          env:
+            - name: PORT
+              #value: "8012"
+              valueFrom:
+                configMapKeyRef:
+                  key: PORT
+                  name: parking-detail
+            - name: DB_HOST
+              #value: "h2:9092//opt/h2/data"
+              valueFrom:
+                configMapKeyRef:
+                  key: DB_HOST
+                  name: h2
+            - name: DB_DATABASE
+              #value: "parking-detail"
+              valueFrom:
+                configMapKeyRef:
+                  key: DB_DATABASE
+                  name: parking-detail
+            - name: DB_USERNAME
+              #value: "sa"
+              valueFrom:
+                secretKeyRef:
+                  key: H2_USERNAME
+                  name: h2
+            - name: DB_PASSWORD
+              #value: "sa"
+              valueFrom:
+                secretKeyRef:
+                  key: H2_PASSWORD
+                  name: h2
+
+---
+# Deployment msvc parking-history
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: driver-parking-history
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: driver-parking-history
+  template:
+    metadata:
+      labels:
+        app: driver-parking-history
+    spec:
+      containers:
+        - image: yaayho/driver-parking-history-image
+          name: driver-parking-history
+          ports:
+            - containerPort: 8011
+          env:
+            - name: PORT
+              #value: "8011"
+              valueFrom:
+                configMapKeyRef:
+                  key: PORT
+                  name: parking-detail
+            - name: DB_HOST
+              #value: "h2:9092//opt/h2/data"
+              valueFrom:
+                configMapKeyRef:
+                  key: DB_HOST
+                  name: h2
+            - name: DB_DATABASE
+              #value: "parking-history"
+              valueFrom:
+                configMapKeyRef:
+                  key: DB_DATABASE
+                  name: parking-history
+            - name: DB_USERNAME
+              #value: "sa"
+              valueFrom:
+                secretKeyRef:
+                  key: H2_USERNAME
+                  name: h2
+            - name: DB_PASSWORD
+              #value: "sa"
+              valueFrom:
+                secretKeyRef:
+                  key: H2_PASSWORD
+                  name: h2

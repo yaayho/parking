@@ -35,7 +35,7 @@ services:
       tags:
         - h2-image:latest
         - yaayho/h2-image
-      dockerfile: ./Dockerfile_H2
+      dockerfile: h2-db/Dockerfile
     ports:
       - "8082:8082"
       - "9092:9092"

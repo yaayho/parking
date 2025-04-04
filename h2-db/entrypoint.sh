@@ -1,5 +1,11 @@
 #!/bin/sh
 
+# Validar que H2_PASSWORD esté definida
+if [ -z "$H2_PASSWORD" ]; then
+    echo "ERROR: H2_PASSWORD empty"
+    exit 1
+fi
+
 # Convertir variable H2_DBS en array
 DB_NAMES=$(echo "${H2_DBS}" | tr ',' ' ')
 

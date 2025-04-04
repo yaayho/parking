@@ -28,6 +28,6 @@ docker push yaayho/driver-parking-history-image
 
 kubectl apply -f deploy_h2.yaml -f svc_h2.yaml
 kubectl apply -f deploy_driver-parking-detail.yaml -f svc_driver-parking-detail.yaml
-
+kubectl apply -f deploy_driver-parking-history.yaml -f svc_driver-parking-history.yaml
 
 
